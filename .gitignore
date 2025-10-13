@@ -3,4 +3,5 @@
 /vendor
 AccountGoSaaS.rar
 Archive.zip
-
+.env
+/storage
