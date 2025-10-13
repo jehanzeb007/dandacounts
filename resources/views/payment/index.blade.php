@@ -13,7 +13,7 @@
 
 @section('action-btn')
     <div class="d-flex">
-        
+
         <a href="{{route('payment.export',$date)}}" data-bs-toggle="tooltip" title="{{__('Export')}}" class="btn btn-sm btn-primary me-2">
             <i class="ti ti-file-export"></i>
         </a>
@@ -100,7 +100,7 @@
                                 <th>{{__('Category')}}</th>
                                 <th>{{__('Reference')}}</th>
                                 <th>{{__('Description')}}</th>
-                                <th>{{__('Payment Receipt')}}</th>
+                                {{--<th>{{__('Payment Receipt')}}</th>--}}
                                 @if(Gate::check('edit payment') || Gate::check('delete payment'))
                                     <th>{{__('Action')}}</th>
                                 @endif
@@ -120,7 +120,7 @@
                                     <td>{{  !empty($payment->category)?$payment->category->name:'-'}}</td>
                                     <td>{{  !empty($payment->reference)?$payment->reference:'-'}}</td>
                                     <td>{{  !empty($payment->description)?$payment->description:'-'}}</td>
-                                    <td>
+                                    {{--<td>
                                         @if(!empty($payment->add_receipt))
                                         <div class="action-btn me-2">
                                         <a  class="mx-3 btn btn-sm align-items-center bg-primary d-inline-flex justify-content-center" href="{{ $paymentpath . '/' . $payment->add_receipt }}" download=""
@@ -129,7 +129,7 @@
                                         </a>
                                         </div>
                                         <div class="action-btn me-2">
-                                            
+
                                             <a href="{{ $paymentpath . '/' . $payment->add_receipt }}"  class="mx-3 btn btn-sm align-items-center bg-secondary d-inline-flex justify-content-center" target="_blank"
                                             data-bs-toggle="tooltip" title="{{ __('Preview') }}"><span class="btn-inner--icon"
                                             ><i class="ti ti-crosshair text-white"></i></span></a>
@@ -137,7 +137,7 @@
                                         @else
                                             -
                                         @endif
-                                    </td>
+                                    </td>--}}
                                     @if(Gate::check('edit revenue') || Gate::check('delete revenue'))
                                         <td class="action ">
                                             @can('edit payment')

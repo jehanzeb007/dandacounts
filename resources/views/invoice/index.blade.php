@@ -98,13 +98,14 @@
                         <table class="table datatable">
                             <thead>
                                 <tr>
-                                    <th> {{ __('Invoice') }}</th>
+                                    <th> {{ __('Invoice') }} - {{__('Ref Number')}}</th>
                                     @if (!\Auth::guard('customer')->check())
                                         <th>{{ __('Customer') }}</th>
                                     @endif
                                     <th>{{ __('Issue Date') }}</th>
                                     <th>{{ __('Due Date') }}</th>
                                     <th>{{ __('Amount Due') }}</th>
+                                    <th>{{ __('Amount Send') }}</th>
                                     <th>{{ __('Status') }}</th>
                                     @if (Gate::check('edit invoice') || Gate::check('delete invoice') || Gate::check('show invoice'))
                                         <th>{{ __('Action') }}</th>
@@ -124,25 +125,27 @@
                                         <td class="Id">
                                             @if (\Auth::guard('customer')->check())
                                                 <a href="{{ route('customer.invoice.show', \Crypt::encrypt($invoice->id)) }}"
-                                                    class="btn btn-outline-primary">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</a>
+                                                    class="badge bg-primary">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</a>
                                             @else
                                                 <a href="{{ route('invoice.show', \Crypt::encrypt($invoice->id)) }}"
-                                                    class="btn btn-outline-primary">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</a>
+                                                    class="badge bg-primary">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</a>
                                             @endif
+                                            <span class="badge bg-info">{{$invoice->ref_number}}</span>
                                         </td>
                                         @if (!\Auth::guard('customer')->check())
                                             <td> {{ !empty($invoice->customer) ? $invoice->customer->name : '' }} </td>
                                         @endif
                                         <td>{{ Auth::user()->dateFormat($invoice->issue_date) }}</td>
                                         <td>
-                                            @if ($invoice->due_date < date('Y-m-d'))
+                                            @if ($invoice->due_date < date('Y-m-d') && $invoice->getDue() > 0)
                                                 <p class="text-danger">
                                                     {{ \Auth::user()->dateFormat($invoice->due_date) }}</p>
                                             @else
-                                                {{ \Auth::user()->dateFormat($invoice->due_date) }}
+                                                <p class="text-success">{{ \Auth::user()->dateFormat($invoice->due_date) }}</p>
                                             @endif
                                         </td>
                                         <td>{{ \Auth::user()->priceFormat($invoice->getDue()) }}</td>
+                                        <td>{{ \Auth::user()->priceFormat($invoice->getTotal()) }}</td>
                                         <td>
                                             @if ($invoice->status == 0)
                                                 <span
@@ -168,7 +171,7 @@
                                                         <div class="action-btn me-2">
                                                             {!! Form::open(['method' => 'get', 'route' => ['invoice.duplicate', $invoice->id]]) !!}
                                                             <a href="#"
-                                                                class="mx-3 btn btn-sm align-items-center bs-pass-para bg-secondary "
+                                                                class="d-none mx-3 btn btn-sm align-items-center bs-pass-para bg-secondary "
                                                                 data-bs-toggle="tooltip" title="{{ __('Duplicate') }}"
                                                                 data-original-title="{{ __('Duplicate') }}">
                                                                 <i class="ti ti-copy text-white"></i>
@@ -198,7 +201,7 @@
                                                         @endif
                                                     @endcan
                                                     @can('edit invoice')
-                                                        <div class="action-btn me-2">
+                                                        <div class="action-btn me-2 d-none">
                                                             <a href="{{ route('invoice.edit', \Crypt::encrypt($invoice->id)) }}"
                                                                 class="mx-3 btn btn-sm align-items-center bg-info"
                                                                 data-bs-toggle="tooltip" title="Edit "

@@ -13,6 +13,7 @@ class InvoiceProduct extends Model
         'tax',
         'discount',
         'total',
+        'plateform_fee',
     ];
 
     public function product(){

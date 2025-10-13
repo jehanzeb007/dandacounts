@@ -334,18 +334,19 @@ $SITE_RTL = !empty($setting['SITE_RTL']) ? $setting['SITE_RTL'] : 'off';
                     </a>
                     <ul
                         class="dash-submenu  {{ Request::segment(1) == 'bill' || Request::segment(1) == 'payment' || Request::segment(1) == 'debit-note' ? 'show' : '' }}">
+                        @can('manage payment')
+                            <li
+                                class="dash-item {{ Request::route()->getName() == 'payment.index' || Request::route()->getName() == 'payment.create' || Request::route()->getName() == 'payment.edit' ? ' active' : '' }}">
+                                <a class="dash-link" href="{{ route('payment.index') }}">{{ __('Payment') }}</a>
+                            </li>
+                        @endcan
                         @can('manage bill')
                         <li
                             class="dash-item  {{ Request::route()->getName() == 'bill.index' || Request::route()->getName() == 'bill.create' || Request::route()->getName() == 'bill.edit' || Request::route()->getName() == 'bill.show' ? ' active' : '' }}">
                             <a class="dash-link" href="{{ route('bill.index') }}">{{ __('Bill') }}</a>
                         </li>
                         @endcan
-                        @can('manage payment')
-                        <li
-                            class="dash-item {{ Request::route()->getName() == 'payment.index' || Request::route()->getName() == 'payment.create' || Request::route()->getName() == 'payment.edit' ? ' active' : '' }}">
-                            <a class="dash-link" href="{{ route('payment.index') }}">{{ __('Payment') }}</a>
-                        </li>
-                        @endcan
+
                         @can('manage debit note')
                         <li class="dash-item {{ Request::route()->getName() == 'debit.note' ? ' active' : '' }}">
                             <a class="dash-link" href="{{ route('debit.note') }}">{{ __('Debit Note') }}</a>

@@ -154,7 +154,7 @@ class InvoiceController extends Controller
             $invoice->invoice_id     = $this->invoiceNumber();
             $invoice->customer_id    = $request->customer_id;
             $invoice->status         = 1;
-            $invoice->send_date      = date('Y-m-d');
+            $invoice->send_date      = $request->issue_date;//date('Y-m-d');
             $invoice->issue_date     = $request->issue_date;
             $invoice->due_date       = $request->due_date;
             $invoice->category_id    = $request->category_id;
@@ -176,7 +176,8 @@ class InvoiceController extends Controller
                 //              $invoiceProduct->discount    = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
                 // $invoiceProduct->discount    = (isset($request->discount_apply)) ? isset($products[$i]['discount']) ? $products[$i]['discount'] : 0: 0;
                 $invoiceProduct->discount    = $products[$i]['discount'];
-                $invoiceProduct->price       = $products[$i]['price'];
+                $invoiceProduct->price       = $products[$i]['price']-$products[$i]['plateform_deduction'];
+                $invoiceProduct->plateform_fee= $products[$i]['plateform_deduction'];
                 $invoiceProduct->description = $products[$i]['description'];
                 $invoiceProduct->save();
 
@@ -304,7 +305,8 @@ class InvoiceController extends Controller
                     $invoiceProduct->quantity    = $products[$i]['quantity'];
                     $invoiceProduct->tax         = $products[$i]['tax'];
                     $invoiceProduct->discount    = $products[$i]['discount'];
-                    $invoiceProduct->price       = $products[$i]['price'];
+                    $invoiceProduct->price       = $products[$i]['price']-$products[$i]['plateform_deduction'];
+                    $invoiceProduct->plateform_fee= $products[$i]['plateform_deduction'];
                     $invoiceProduct->description = $products[$i]['description'];
                     $invoiceProduct->save();
 
@@ -449,7 +451,7 @@ class InvoiceController extends Controller
             if($invoiceProduct){
                 $invoice = Invoice::find($invoiceProduct->invoice_id);
                 $productService = ProductService::find($invoiceProduct->product_id);
-                Utility::updateUserBalance('customer', $invoice->customer_id, $request->amount, 'debit');
+                Utility::updateUserBalance('customer', $invoice->customer_id, $request->amount, 'credit');
                 TransactionLines::where('reference_sub_id', $productService->id)->where('reference', 'Invoice')->delete();
                 InvoiceProduct::where('id', '=', $request->id)->delete();
                 return response()->json(['status' => true, 'message' => __('Invoice product successfully deleted.')]);
@@ -519,7 +521,7 @@ class InvoiceController extends Controller
     {
         if (\Auth::user()->can('send invoice')) {
             $invoice            = Invoice::where('id', $id)->first();
-            $invoice->send_date = date('Y-m-d');
+            //$invoice->send_date = date('Y-m-d');
             $invoice->status    = 1;
             $invoice->save();
 
@@ -671,7 +673,7 @@ class InvoiceController extends Controller
             $due     = $invoice->getDue();
             $total   = $invoice->getTotal();
             if ($invoice->status == 0) {
-                $invoice->send_date = date('Y-m-d');
+                //$invoice->send_date = date('Y-m-d');
                 $invoice->save();
             }
 
@@ -1047,6 +1049,7 @@ class InvoiceController extends Controller
             $item->tax         = $product->tax;
             $item->discount    = $product->discount;
             $item->price       = $product->price;
+            $item->plateform_fee = $product->plateform_fee;
             $item->description = $product->description;
 
             $totalQuantity += $item->quantity;
@@ -1380,6 +1383,7 @@ class InvoiceController extends Controller
 
             return view('invoice.templates.' . $settings['invoice_template'], compact('invoice', 'user', 'color', 'settings', 'img', 'font_color'));
         } else {
+
             return redirect()->route('pay.invoice', \Illuminate\Support\Facades\Crypt::encrypt($invoiceId))->with('error', __('Permission denied.'));
         }
     }

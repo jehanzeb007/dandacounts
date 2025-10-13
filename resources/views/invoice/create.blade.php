@@ -46,10 +46,13 @@
 
                     var inputs = $(".amount");
                     var subTotal = 0;
+                    var plateFormTotal = 0;
                     for (var i = 0; i < inputs.length; i++) {
                         subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
+                        plateFormTotal = parseFloat(plateFormTotal) + parseFloat($(inputs[i]).html());
                     }
                     $('.subTotal').html(subTotal.toFixed(2));
+                    $('.PlatefromDeductionTotal').html(plateFormTotal.toFixed(2));
                     $('.totalAmount').html(subTotal.toFixed(2));
                 }
             },
@@ -126,6 +129,7 @@
                 // console.log(item)
                 $(el.parent().parent().find('.quantity')).val(1);
                 $(el.parent().parent().find('.price')).val(item.product.sale_price);
+                $(el.parent().parent().find('.plateform_deduction')).val(0);
                 $(el.parent().parent().parent().find('.pro_description')).val(item.product.description);
 
                 var taxes = '';
@@ -167,6 +171,13 @@
                         totalItemPrice += parseFloat(priceInput[j].value);
                     }
                 }
+                var totalItemPlateFormFeesPrice = 0;
+                var plateformDetuctionInput = $('.plateform_deduction');
+                for (var j = 0; j < plateformDetuctionInput.length; j++) {
+                    if (!isNaN(parseFloat(plateformDetuctionInput[j].value))) {
+                        totalItemPlateFormFeesPrice += parseFloat(plateformDetuctionInput[j].value);
+                    }
+                }
 
                 var totalItemTaxPrice = 0;
                 var itemTaxPriceInput = $('.itemTaxPrice');
@@ -187,6 +198,7 @@
                 }
 
                 $('.subTotal').html(totalItemPrice.toFixed(2));
+                $('.PlatefromDeductionTotal').html(totalItemPlateFormFeesPrice.toFixed(2));
                 $('.totalTax').html(totalItemTaxPrice.toFixed(2));
                 $('.totalAmount').html((parseFloat(totalItemPrice) - parseFloat(totalItemDiscountPrice) + parseFloat(totalItemTaxPrice)).toFixed(2));
 
@@ -195,173 +207,54 @@
         });
     });
 
-    $(document).on('keyup', '.quantity', function () {
-        var quntityTotalTaxPrice = 0;
+    function recalculateRow(el) {
+        const quantity = parseFloat(el.find('.quantity').val()) || 0;
+        const price = parseFloat(el.find('.price').val()) || 0;
+        const discount = parseFloat(el.find('.discount').val()) || 0;
+        const platformFee = parseFloat(el.find('.plateform_deduction').val()) || 0;
+        const taxRate = parseFloat(el.find('.itemTaxRate').val()) || 0;
 
-        var el = $(this).parent().parent().parent().parent();
+        const totalItemPrice = (quantity * price) - discount;
+        const itemTaxPrice = (taxRate / 100) * totalItemPrice;
+        const amount = totalItemPrice + itemTaxPrice - platformFee;
 
-        var quantity = $(this).val();
-        var price = $(el.find('.price')).val();
-        var discount = $(el.find('.discount')).val();
-        if(discount.length <= 0)
-        {
-            discount = 0 ;
-        }
+        el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
+        el.find('.amount').html(amount.toFixed(2));
 
-        var totalItemPrice = (quantity * price) - discount;
+        recalculateTotals();
+    }
 
-        var amount = (totalItemPrice);
+    function recalculateTotals() {
+        let subTotal = 0,
+            totalTax = 0,
+            totalDiscount = 0,
+            plateFormTotal = 0;
 
+        $('.itemTaxPrice').each(function () {
+            totalTax += parseFloat($(this).val()) || 0;
+        });
 
-        var totalItemTaxRate = $(el.find('.itemTaxRate')).val();
-        var itemTaxPrice = parseFloat((totalItemTaxRate / 100) * (totalItemPrice));
-        $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
+        $('.discount').each(function () {
+            totalDiscount += parseFloat($(this).val()) || 0;
+        });
 
-        $(el.find('.amount')).html(parseFloat(itemTaxPrice)+parseFloat(amount));
+        $('.amount').each(function () {
+            subTotal += parseFloat($(this).html()) || 0;
+        });
+        $('.plateform_deduction').each(function() {
+            plateFormTotal += parseFloat($(this).val()) || 0;
+        });
+        $('.subTotal').html(subTotal.toFixed(2));
+        $('.PlatefromDeductionTotal').html(plateFormTotal.toFixed(2));
+        $('.totalTax').html(totalTax.toFixed(2));
+        $('.totalDiscount').html(totalDiscount.toFixed(2));
+        $('.totalAmount').html(subTotal.toFixed(2)); // Adjust if you add tax/subtotal separately
+    }
+    $(document).on('keyup change', '.quantity, .price, .discount, .plateform_deduction', function () {
+        const el = $(this).closest('tr'); // cleaner than chaining multiple parents
+        recalculateRow(el);
+    });
 
-        var totalItemTaxPrice = 0;
-        var itemTaxPriceInput = $('.itemTaxPrice');
-        for (var j = 0; j < itemTaxPriceInput.length; j++) {
-            totalItemTaxPrice += parseFloat(itemTaxPriceInput[j].value);
-        }
-
-
-        var totalItemPrice = 0;
-        var inputs_quantity = $(".quantity");
-
-        var priceInput = $('.price');
-        for (var j = 0; j < priceInput.length; j++) {
-            totalItemPrice += (parseFloat(priceInput[j].value) * parseFloat(inputs_quantity[j].value));
-        }
-
-        var inputs = $(".amount");
-
-        var subTotal = 0;
-        for (var i = 0; i < inputs.length; i++) {
-            subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
-        }
-
-        $('.subTotal').html(totalItemPrice.toFixed(2));
-        $('.totalTax').html(totalItemTaxPrice.toFixed(2));
-
-        $('.totalAmount').html((parseFloat(subTotal)).toFixed(2));
-
-    })
-
-    $(document).on('keyup change', '.price', function () {
-        var el = $(this).parent().parent().parent().parent();
-        var price = $(this).val();
-        var quantity = $(el.find('.quantity')).val();
-
-        var discount = $(el.find('.discount')).val();
-        if(discount.length <= 0)
-        {
-            discount = 0 ;
-        }
-        var totalItemPrice = (quantity * price)-discount;
-
-        var amount = (totalItemPrice);
-
-
-        var totalItemTaxRate = $(el.find('.itemTaxRate')).val();
-        var itemTaxPrice = parseFloat((totalItemTaxRate / 100) * (totalItemPrice));
-        $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
-
-        $(el.find('.amount')).html(parseFloat(itemTaxPrice)+parseFloat(amount));
-
-        var totalItemTaxPrice = 0;
-        var itemTaxPriceInput = $('.itemTaxPrice');
-        for (var j = 0; j < itemTaxPriceInput.length; j++) {
-            totalItemTaxPrice += parseFloat(itemTaxPriceInput[j].value);
-        }
-
-
-        var totalItemPrice = 0;
-        var inputs_quantity = $(".quantity");
-
-        var priceInput = $('.price');
-        for (var j = 0; j < priceInput.length; j++) {
-            totalItemPrice += (parseFloat(priceInput[j].value) * parseFloat(inputs_quantity[j].value));
-        }
-
-        var inputs = $(".amount");
-
-        var subTotal = 0;
-        for (var i = 0; i < inputs.length; i++) {
-            subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
-        }
-
-        $('.subTotal').html(totalItemPrice.toFixed(2));
-        $('.totalTax').html(totalItemTaxPrice.toFixed(2));
-
-        $('.totalAmount').html((parseFloat(subTotal)).toFixed(2));
-
-
-    })
-
-    $(document).on('keyup change', '.discount', function () {
-        var el = $(this).parent().parent().parent();
-        var discount = $(this).val();
-        if(discount.length <= 0)
-        {
-            discount = 0 ;
-        }
-
-        var price = $(el.find('.price')).val();
-        var quantity = $(el.find('.quantity')).val();
-        var totalItemPrice = (quantity * price) - discount;
-
-
-        var amount = (totalItemPrice);
-
-
-        var totalItemTaxRate = $(el.find('.itemTaxRate')).val();
-        var itemTaxPrice = parseFloat((totalItemTaxRate / 100) * (totalItemPrice));
-        $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
-
-        $(el.find('.amount')).html(parseFloat(itemTaxPrice)+parseFloat(amount));
-
-        var totalItemTaxPrice = 0;
-        var itemTaxPriceInput = $('.itemTaxPrice');
-        for (var j = 0; j < itemTaxPriceInput.length; j++) {
-            totalItemTaxPrice += parseFloat(itemTaxPriceInput[j].value);
-        }
-
-
-        var totalItemPrice = 0;
-        var inputs_quantity = $(".quantity");
-
-        var priceInput = $('.price');
-        for (var j = 0; j < priceInput.length; j++) {
-            totalItemPrice += (parseFloat(priceInput[j].value) * parseFloat(inputs_quantity[j].value));
-        }
-
-        var inputs = $(".amount");
-
-        var subTotal = 0;
-        for (var i = 0; i < inputs.length; i++) {
-            subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
-        }
-
-
-        var totalItemDiscountPrice = 0;
-        var itemDiscountPriceInput = $('.discount');
-
-        for (var k = 0; k < itemDiscountPriceInput.length; k++) {
-            if (!isNaN(parseFloat(itemDiscountPriceInput[k].value))) {
-                totalItemDiscountPrice += parseFloat(itemDiscountPriceInput[k].value);
-            }
-        }
-
-
-        $('.subTotal').html(totalItemPrice.toFixed(2));
-        $('.totalTax').html(totalItemTaxPrice.toFixed(2));
-
-        $('.totalAmount').html((parseFloat(subTotal)).toFixed(2));
-        $('.totalDiscount').html(totalItemDiscountPrice.toFixed(2));
-
-
-    })
 
     $(document).on('change', '.item', function () {
         $('.item option').prop('hidden', false);
@@ -403,7 +296,7 @@
 @endpush
 @section('content')
     <div class="row">
-        {{ Form::open(array('url' => 'invoice','class'=>'w-100 needs-validation','novalidate')) }}
+        {{ Form::open(array('url' => 'invoice','class'=>'w-100 needs-validation','novalidate','autocomplete'=>'off')) }}
         <div class="col-12">
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="card">
@@ -458,7 +351,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="form-group">
                                         {{ Form::label('ref_number', __('Ref Number'),['class'=>'form-label']) }}
                                         <div class="form-icon-user">
@@ -498,41 +391,51 @@
                         <table class="table  mb-0 table-custom-style" data-repeater-list="items" id="sortable-table">
                             <thead>
                             <tr>
-                                <th>{{__('Items')}}</th>
-                                <th>{{__('Quantity')}}</th>
-                                <th>{{__('Price')}} </th>
-                                <th>{{__('Discount')}}</th>
-                                <th>{{__('Tax')}} (%)</th>
-                                <th class="text-end">{{__('Amount')}} <br><small class="text-danger font-weight-bold">{{__('before tax & discount')}}</small></th>
-                                <th></th>
+                                <th width="20%">{{ __('Items') }}</th>
+                                <th width="10%">{{ __('Quantity') }}</th>
+                                <th width="20%">{{ __('Price') }}</th>
+                                <th width="10%">{{ __('Platform Deduction') }}</th>
+                                <th width="20%">{{ __('Discount') }}</th>
+                                <th width="10%">{{ __('Tax (%)') }}</th>
+                                <th class="text-end" width="5%">
+                                    {{ __('Amount') }}
+                                    <small class="text-danger font-weight-bold">{{ __('Total') }}</small>
+                                </th>
+                                <th width="5%"></th>
                             </tr>
                             </thead>
 
                             <tbody class="ui-sortable" data-repeater-item>
                             <tr>
 
-                                <td width="25%" class="form-group pt-0 flex-nowrap">
+                                <td class="form-group pt-0 flex-nowrap">
                                     {{ Form::select('item', $product_services,'', array('class' => 'form-control item','data-url'=>route('invoice.product'),'required'=>'required')) }}
                                 </td>
-                                <td>
+                                <td style="display: block;">
                                     <div class="form-group price-input input-group search-form flex-nowrap">
-                                        {{ Form::number('quantity','', array('class' => 'form-control quantity','required'=>'required','placeholder'=>__('Qty'),'required'=>'required')) }}
                                         <span class="unit input-group-text bg-transparent d-none"></span>
+                                        {{ Form::text('quantity',1, array('class' => 'form-control quantity','placeholder'=>__('Qty'),'required'=>'required')) }}
                                     </div>
                                 </td>
 
 
                                 <td>
                                     <div class="form-group price-input input-group search-form flex-nowrap">
-                                        {{ Form::number('price','', array('class' => 'form-control price','required'=>'required','placeholder'=>__('Price'),'required'=>'required')) }}
                                         <span class="input-group-text bg-transparent">{{\Auth::user()->currencySymbol()}}</span>
+                                        {{ Form::text('price','', array('class' => 'form-control price','placeholder'=>__('Price'),'required'=>'required')) }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group price-input input-group search-form flex-nowrap">
+                                        <span class="input-group-text bg-transparent">{{\Auth::user()->currencySymbol()}}</span>
+                                        {{ Form::text('plateform_deduction',0, array('class' => 'form-control plateform_deduction','required'=>'required','placeholder'=>__('plateform_deduction'))) }}
                                     </div>
                                 </td>
 
                                 <td>
                                     <div class="form-group price-input input-group search-form flex-nowrap">
-                                        {{ Form::number('discount','', array('class' => 'form-control discount','required'=>'required','placeholder'=>__('Discount'))) }}
                                         <span class="input-group-text bg-transparent">{{\Auth::user()->currencySymbol()}}</span>
+                                        {{ Form::text('discount','', array('class' => 'form-control discount','required'=>'required','placeholder'=>__('Discount'))) }}
                                     </div>
                                 </td>
 
@@ -574,6 +477,15 @@
                                 <td></td>
                                 <td><strong>{{__('Sub Total')}} ({{\Auth::user()->currencySymbol()}})</strong></td>
                                 <td class="text-end subTotal">0.00</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td></td>
+                                <td><strong>{{__('P.Deduction Total')}} ({{\Auth::user()->currencySymbol()}})</strong></td>
+                                <td class="text-end PlatefromDeductionTotal">0.00</td>
                                 <td></td>
                             </tr>
                             <tr>

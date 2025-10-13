@@ -288,7 +288,7 @@ class ReportController extends Controller
             } else {
                 $month = $this->yearMonth();
             }
-           
+
             $data['monthList'] = $month;
             $data['yearList'] = $this->yearList();
             $data['periods']   = $this->period();
@@ -550,11 +550,11 @@ class ReportController extends Controller
 
             foreach ($yearList as $year) {
                 $expenseArr[$year] = [];
-            
+
                 for ($i = 1; $i <= 12; $i++) {
                     $expenseArr[$year][$i] = 0;
                 }
-            
+
                 if (isset($paymentTotalArray[$year])) {
                     foreach ($paymentTotalArray[$year] as $month => $values) {
                         $expenseArr[$year][$month] = array_sum($values);
@@ -572,11 +572,11 @@ class ReportController extends Controller
 
             foreach ($yearList as $year) {
                 $billArr[$year] = [];
-            
+
                 for ($i = 1; $i <= 12; $i++) {
                     $billArr[$year][$i] = 0;
                 }
-            
+
                 if (isset($billTotalArray[$year])) {
                     foreach ($billTotalArray[$year] as $month => $values) {
                         $billArr[$year][$month] = array_sum($values);
@@ -633,11 +633,11 @@ class ReportController extends Controller
 
             foreach ($yearList as $year) {
                 $incomeArr[$year] = [];
-            
+
                 for ($i = 1; $i <= 12; $i++) {
                     $incomeArr[$year][$i] = 0;
                 }
-            
+
                 if (isset($revenueTotalArray[$year])) {
                     foreach ($revenueTotalArray[$year] as $month => $values) {
                         $incomeArr[$year][$month] = array_sum($values);
@@ -655,11 +655,11 @@ class ReportController extends Controller
 
             foreach ($yearList as $year) {
                 $invoiceArr[$year] = [];
-            
+
                 for ($i = 1; $i <= 12; $i++) {
                     $invoiceArr[$year][$i] = 0;
                 }
-            
+
                 if (isset($invoiceTotalArray[$year])) {
                     foreach ($invoiceTotalArray[$year] as $month => $values) {
                         $invoiceArr[$year][$month] = array_sum($values);
@@ -683,7 +683,7 @@ class ReportController extends Controller
                             $profit[$i][$j] = $value1 - $chartExpenseArr[$i][$j];
                         }
                     }
-                } 
+                }
 
 
             $data['paymentExpenseTotal'] = $expensesum;
@@ -1968,7 +1968,7 @@ class ReportController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
-    
+
     public function profitLossExport(Request $request)
     {
 
@@ -3084,15 +3084,15 @@ class ReportController extends Controller
                 $end   = date('Y-m-t');
             }
 
-            if (!empty($request->account)) 
+            if (!empty($request->account))
             {
                 $chart_accounts = ChartOfAccount::where('id', $request->account)->where('created_by', \Auth::user()->creatorId())->get();
                 $accounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_accounts.parent')
                     ->where('parent', '=', 0)
                     ->where('created_by', \Auth::user()->creatorId())->get()
                     ->toarray();
-            } 
-            else 
+            }
+            else
             {
                 $chart_accounts = ChartOfAccount::where('created_by', \Auth::user()->creatorId())->get();
                 $accounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_accounts.parent')

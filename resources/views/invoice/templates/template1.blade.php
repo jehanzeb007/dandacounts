@@ -292,6 +292,14 @@
                         <td>
                             <strong style="margin-bottom: 10px; display:block;">{{ __('Bill To') }}:</strong>
                             <p>
+                                {{ !empty($customer->name) ? $customer->name : '' }}<br>
+                                {{ !empty($customer->email) ? $customer->email : '' }}<br>
+                            </p>
+                        </td>
+                        @if ($settings['billing_display'] == 'on')
+                        <td>
+                            <strong style="margin-bottom: 10px; display:block;">{{ __('Bill To') }}:</strong>
+                            <p>
                                 {{ !empty($customer->billing_name) ? $customer->billing_name : '' }}<br>
                                 {{ !empty($customer->billing_address) ? $customer->billing_address : '' }}<br>
                                 {{ !empty($customer->billing_city) ? $customer->billing_city : '' . ', ' }},
@@ -301,6 +309,7 @@
                                 {{ !empty($customer->billing_phone) ? $customer->billing_phone : '' }}<br>
                             </p>
                         </td>
+                        @endif
                         @if ($settings['shipping_display'] == 'on')
                             <td class="text-right">
                                 <strong style="margin-bottom: 10px; display:block;">{{ __('Ship To') }}:</strong>
@@ -323,10 +332,11 @@
                     <tr>
                         <th>{{ __('Item') }}</th>
                         <th>{{ __('Quantity') }}</th>
-                        <th>{{ __('Rate') }}</th>
+                        <th>{{ __('Price') }}</th>
+                        <th>{{ __('P.Deduction') }}</th>
                         <th>{{ __('Discount') }}</th>
                         <th>{{ __('Tax') }} (%)</th>
-                        <th>{{ __('Price') }} <small>{{ 'after tax & discount' }}</small></th>
+                        <th>{{ __('Price') }} <small>{{ 'total' }}</small></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -335,7 +345,8 @@
                             <tr>
                                 <td>{{ $item->name }}</td>
                                 <td>{{ $item->quantity }}</td>
-                                <td>{{ Utility::priceFormat($settings, $item->price) }}</td>
+                                <td>{{ Utility::priceFormat($settings, $item->price+$item->plateform_fee) }}</td>
+                                <td>{{ Utility::priceFormat($settings, $item->plateform_fee) }}</td>
                                 <td>{{ $item->discount != 0 ? Utility::priceFormat($settings, $item->discount) : '-' }}
                                 </td>
                                 <td>
@@ -358,11 +369,6 @@
                                 @endphp
                                 <td>{{ Utility::priceFormat($settings, $item->price * $item->quantity - $item->discount + $itemtax) }}
                                 </td>
-                                @if (!empty($item->description))
-                            <tr class="border-0 itm-description ">
-                                <td colspan="6">{{ $item->description }}</td>
-                            </tr>
-                        @endif
                         </tr>
                     @endforeach
                 @else
@@ -373,18 +379,27 @@
                     <tr>
                         <td>{{ __('Total') }}</td>
                         <td>{{ $invoice->totalQuantity }}</td>
-                        <td>{{ Utility::priceFormat($settings, $invoice->totalRate) }}</td>
+                        <td>{{ Utility::priceFormat($settings, $invoice->totalRate+$invoice->getTotalPlateformFee()) }}</td>
+                        <td>{{ Utility::priceFormat($settings, $invoice->getTotalPlateformFee()) }}</td>
                         <td>{{ Utility::priceFormat($settings, $invoice->totalDiscount) }}</td>
                         <td>{{ Utility::priceFormat($settings, $invoice->totalTaxPrice) }}</td>
                         <td>{{ Utility::priceFormat($settings, $invoice->getSubTotal()) }}</td>
                     </tr>
                     <tr>
-                        <td colspan="4"></td>
+                        <td colspan="5">
+                        @if (!empty($item->description))
+                                {!! nl2br($item->description) !!}
+                        @endif
+                        </td>
                         <td colspan="2" class="sub-total">
                             <table class="total-table">
                                 <tr>
                                     <td>{{ __('Subtotal') }}:</td>
-                                    <td>{{ Utility::priceFormat($settings, $invoice->getSubTotal()) }}</td>
+                                    <td>{{ Utility::priceFormat($settings, $invoice->getSubTotal()+$invoice->getTotalPlateformFee()) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('P.Deduction Total') }}:</td>
+                                    <td>{{ Utility::priceFormat($settings, $invoice->getTotalPlateformFee()) }}</td>
                                 </tr>
                                 @if ($invoice->getTotalDiscount())
                                     <tr>
@@ -433,7 +448,7 @@
         </div>
     </div>
     @if (!isset($preview))
-        @include('invoice.script');
+        @include('invoice.script')
     @endif
 
 </body>

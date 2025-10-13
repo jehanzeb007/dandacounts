@@ -523,12 +523,20 @@
                                             @foreach ($monthList as $month)
                                                 <th>{{ $month }}</th>
                                             @endforeach
+                                            <th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td colspan="13" class="text-dark"><span>{{ __('Income : ') }}</span></td>
                                         </tr>
+                                        @php
+                                            $totalRevenueIncome = 0;
+                                            $totalInvoiceIncome = 0;
+                                            $totalPaymentExpense= 0;
+                                            $totalBillExpense = 0;
+                                            $totalProfit = 0;
+                                        @endphp
                                         <tr>
 
                                             <td>{{ __('Revenue') }}</td>
@@ -537,13 +545,19 @@
                                                     @if (is_array($revenue) || is_object($revenue))
                                                         @foreach ($revenue as $value)
                                                             {{ \Auth::user()->priceFormat($value) }}
+                                                            @php
+                                                                $totalRevenueIncome += $value;
+                                                            @endphp
                                                         @endforeach
                                                     @else
                                                         {{ \Auth::user()->priceFormat($revenue) }}
+                                                        @php
+                                                            $totalRevenueIncome += $revenue;
+                                                        @endphp
                                                     @endif
                                                 </td>
                                             @endforeach
-
+                                                <td><strong>{{ \Auth::user()->priceFormat($totalRevenueIncome) }}</strong></td>
                                         </tr>
                                         <tr>
                                             <td>{{ __('Invoice') }}</td>
@@ -552,12 +566,19 @@
                                                     @if (is_array($invoice) || is_object($invoice))
                                                         @foreach ($invoice as $value)
                                                             {{ \Auth::user()->priceFormat($value) }}
+                                                            @php
+                                                                $totalInvoiceIncome += $value;
+                                                            @endphp
                                                         @endforeach
                                                     @else
                                                         {{ \Auth::user()->priceFormat($invoice) }}
+                                                        @php
+                                                            $totalInvoiceIncome += $invoice;
+                                                        @endphp
                                                     @endif
                                                 </td>
                                             @endforeach
+                                            <td><strong>{{ \Auth::user()->priceFormat($totalInvoiceIncome) }}</strong></td>
                                         </tr>
                                         <tr>
                                             <td colspan="13" class="text-dark"><span>{{ __('Expense : ') }}</span></td>
@@ -569,12 +590,19 @@
                                                     @if (is_array($payment) || is_object($payment))
                                                         @foreach ($payment as $value)
                                                             {{ \Auth::user()->priceFormat($value) }}
+                                                            @php
+                                                                $totalPaymentExpense += $value;
+                                                            @endphp
                                                         @endforeach
                                                     @else
                                                         {{ \Auth::user()->priceFormat($payment) }}
+                                                        @php
+                                                            $totalPaymentExpense += $payment;
+                                                        @endphp
                                                     @endif
                                                 </td>
                                             @endforeach
+                                            <td><strong>{{ \Auth::user()->priceFormat($totalPaymentExpense) }}</strong></td>
 
                                         </tr>
                                         <tr>
@@ -584,13 +612,19 @@
                                                     @if (is_array($bill) || is_object($bill))
                                                         @foreach ($bill as $value)
                                                             {{ \Auth::user()->priceFormat($value) }}
+                                                            @php
+                                                                $totalBillExpense += $value;
+                                                            @endphp
                                                         @endforeach
                                                     @else
                                                         {{ \Auth::user()->priceFormat($bill) }}
+                                                        @php
+                                                            $totalBillExpense += $bill;
+                                                        @endphp
                                                     @endif
                                                 </td>
                                             @endforeach
-
+                                            <td><strong>{{ \Auth::user()->priceFormat($totalBillExpense) }}</strong></td>
                                         </tr>
                                         <tr>
                                             <td colspan="13" class="text-dark">
@@ -604,9 +638,12 @@
                                             @foreach ($profit as $prft)
                                                 @foreach ($prft as $value)
                                                     <td>{{ \Auth::user()->priceFormat($value) }}</td>
+                                                    @php
+                                                        $totalBillExpense += $value;
+                                                    @endphp
                                                 @endforeach
                                             @endforeach
-
+                                            <td><strong>{{ \Auth::user()->priceFormat($totalBillExpense) }}</strong></td>
                                         </tr>
                                     </tbody>
                                 </table>

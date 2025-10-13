@@ -13,7 +13,7 @@ class CreateInvoiceProductsTable extends Migration
      */
     public function up()
     {
-        Schema::create('invoice_products',function (Blueprint $table) 
+        Schema::create('invoice_products',function (Blueprint $table)
         {
                 $table->bigIncrements('id');
                 $table->integer('invoice_id');
@@ -22,6 +22,7 @@ class CreateInvoiceProductsTable extends Migration
                 $table->decimal('tax', 15, 2)->default('0.00');
                 $table->decimal('discount', 15, 2)->default('0.00');
                 $table->decimal('price', 15, 2)->default('0.00');
+                $table->decimal('invoice_products', 15, 2)->default('0.00');
                 $table->text('description')->nullable();
                 $table->timestamps();
             }

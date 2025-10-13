@@ -60,6 +60,15 @@ class Invoice extends Model
 
         return $subTotal;
     }
+    public function getTotalPlateformFee()
+    {
+        $subTotal = 0;
+        foreach ($this->items as $product) {
+            $subTotal += ($product->plateform_fee);
+        }
+
+        return $subTotal;
+    }
 
     public function getTotalTax()
     {
@@ -103,7 +112,7 @@ class Invoice extends Model
 
     public static function change_status($invoice_id, $status)
     {
-        
+
         $invoice         = Invoice::find($invoice_id);
         $invoice->status = $status;
         $invoice->update();

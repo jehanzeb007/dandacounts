@@ -284,18 +284,28 @@
                                         @foreach ($monthList as $month)
                                             <th>{{ $month }}</th>
                                         @endforeach
+                                        <th>Grand Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td colspan="13" class="text-dark"><span>{{ __('Payment :') }}</span></td>
                                     </tr>
+                                    @php
+                                        $totalExpens = 0;
+                                        $totalbill = 0;
+                                        $totaloverall = 0;
+                                    @endphp
                                     @foreach ($expenseArr as $i => $expense)
                                         <tr>
                                             <td>{{ $expense['category'] }}</td>
                                             @foreach ($expense['data'] as $j => $data)
                                                 <td>{{ \Auth::user()->priceFormat($data) }}</td>
+                                                @php
+                                                    $totalExpens += $data;
+                                                @endphp
                                             @endforeach
+                                            <td>{{ \Auth::user()->priceFormat($totalExpens) }}</td>
                                         </tr>
                                     @endforeach
                                     <tr>
@@ -306,7 +316,11 @@
                                             <td>{{ $bill['category'] }}</td>
                                             @foreach ($bill['data'] as $j => $data)
                                                 <td>{{ \Auth::user()->priceFormat($data) }}</td>
+                                                @php
+                                                    $totalbill += $data;
+                                                @endphp
                                             @endforeach
+                                            <td>{{ \Auth::user()->priceFormat($totalbill) }}</td>
                                         </tr>
                                     @endforeach
                                     <tr>
@@ -322,8 +336,12 @@
                                         @foreach ($chartExpenseArr as $i => $expense)
                                             @foreach ($expense as $value)
                                                 <td>{{ \Auth::user()->priceFormat($value) }}</td>
+                                                @php
+                                                    $totaloverall += $value;
+                                                @endphp
                                             @endforeach
                                         @endforeach
+                                        <td>{{ \Auth::user()->priceFormat($totaloverall) }}</td>
                                     </tr>
                                 </tbody>
                             </table>
