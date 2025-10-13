@@ -134,7 +134,7 @@
                                             @endif
                                         @endif
                                         @if(in_array('income vs expense '.$module,(array) $permissions))
-                                            @if($key = array_search('expense '.$module,$permissions))
+                                            @if($key = array_search('income vs expense '.$module,$permissions))
                                                 <div class="col-md-3 custom-control custom-checkbox">
                                                     {{Form::checkbox('permissions[]',$key,$role->permission, ['class'=>'form-check-input isscheck isscheck_'.str_replace(' ', '', $module),'id' =>'permission'.$key])}}
                                                     {{Form::label('permission'.$key,'Income VS Expense',['class'=>'form-check-label'])}}<br>
