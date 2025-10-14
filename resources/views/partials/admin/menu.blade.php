@@ -462,7 +462,12 @@ $SITE_RTL = !empty($setting['SITE_RTL']) ? $setting['SITE_RTL'] : 'off';
 
 
 
-
+                <li class="dash-item {{ Request::segment(1) == 'advanceborrow' ? 'active' : '' }}">
+                    <a href="{{ route('advanceborrow.index') }}" class="dash-link ">
+                        <span class="dash-micon"><i class="ti ti-target"></i></span>
+                        <span class="dash-mtext">{{ __('Advance Borrow') }}</span>
+                    </a>
+                </li>
                 {{-- -------  Goal---------- --}}
                 @if (Gate::check('manage goal'))
                 <li class="dash-item {{ Request::segment(1) == 'goal' ? 'active' : '' }}">

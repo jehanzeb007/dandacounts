@@ -79,7 +79,7 @@ use App\Http\Controllers\ProductStockController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaxController;
-
+use App\Http\Controllers\AdvanceBorrowController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -873,6 +873,7 @@ Route::resource('budget', BudgetController::class)->middleware(['auth', 'XSS', '
 
 
 Route::resource('goal', GoalController::class)->middleware(['auth', 'XSS', 'revalidate']);
+Route::resource('advanceborrow', AdvanceBorrowController::class)->middleware(['auth', 'XSS', 'revalidate']);
 Route::resource('account-assets', AssetController::class)->middleware(['auth', 'XSS', 'revalidate']);
 Route::resource('custom-field', CustomFieldController::class)->middleware(['auth', 'XSS', 'revalidate']);
 
