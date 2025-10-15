@@ -94,7 +94,9 @@ $setting_arr = Utility::file_validate();
 <script>
     $('select').select2();
     feather.replace();
-
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
     function removeClassByPrefix(node, prefix) {
         for (let i = 0; i < node.classList.length; i++) {
             let value = node.classList[i];

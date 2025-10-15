@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use Illuminate\Support\HtmlString;
 
 
 use Carbon\Carbon;
@@ -84,7 +85,14 @@ class User extends Authenticatable
     {
         $settings = Utility::settings();
 
-        return (($settings['site_currency_symbol_position'] == "pre") ? $settings['site_currency_symbol'] : '') . number_format($price, $settings['decimal_number']) . (($settings['site_currency_symbol_position'] == "post") ? $settings['site_currency_symbol'] : '');
+        $amountString = (($settings['site_currency_symbol_position'] == "pre") ? $settings['site_currency_symbol'] : '')
+            . number_format($price, $settings['decimal_number'])
+            . (($settings['site_currency_symbol_position'] == "post") ? $settings['site_currency_symbol'] : '');
+
+        $amountString = "<span data-toggle='tooltip' title='" . Utility::numberToUrduWords($price) . "'>" . $amountString . "</span>";
+
+        // ✅ Return as HtmlString to auto-render in {{ }}
+        return new HtmlString($amountString);
     }
 
     public function currencySymbol()
@@ -2483,7 +2491,7 @@ class User extends Authenticatable
 
 
         ];
-       
+
         $email = EmailTemplate::all();
 
         foreach ($email as $e) {
