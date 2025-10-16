@@ -2234,7 +2234,7 @@ class ReportController extends Controller
             'monthly' => 'Monthly',
             'quarterly' => 'Quarterly',
             'half-yearly' => 'Half Yearly',
-            'yearly' => 'Yearly',
+            //'yearly' => 'Yearly',
         ];
     }
 
@@ -2289,13 +2289,16 @@ class ReportController extends Controller
 
 
             $totalInvoice      = 0;
+            $totalPlateformfees = 0;
             $totalDueInvoice   = 0;
             $invoiceTotalArray = [];
             foreach ($invoices as $invoice) {
                 $totalInvoice = $invoices->sum(function ($invoice) {
                     return $invoice->getTotal();
                 });
-
+                $totalPlateformfees = $invoices->sum(function ($invoice) {
+                    return $invoice->getTotalPlateformFee();
+                });
                 $totalDueInvoice = $invoices->sum(function ($invoice) {
                     return $invoice->getDue();
                 });
@@ -2310,7 +2313,7 @@ class ReportController extends Controller
 
             $monthList = $month = $this->yearMonth();
 
-            return view('report.invoice_report', compact('invoices', 'customer', 'status', 'totalInvoice', 'totalDueInvoice', 'totalPaidInvoice', 'invoiceTotal', 'monthList', 'filter'));
+            return view('report.invoice_report', compact('invoices', 'customer', 'status', 'totalInvoice','totalPlateformfees', 'totalDueInvoice', 'totalPaidInvoice', 'invoiceTotal', 'monthList', 'filter'));
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
         }

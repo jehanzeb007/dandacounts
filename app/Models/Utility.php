@@ -3835,4 +3835,10 @@ class Utility extends Model
 
         return $final;
     }
+    public static function debug($array,$exit=0){
+        echo '<pre>';print_r($array);echo '</pre>';
+        if($exit){
+            exit;
+        }
+    }
 }

@@ -273,18 +273,29 @@
                                         @foreach ($monthList as $month)
                                             <th>{{ $month }}</th>
                                         @endforeach
+                                        <th>Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td colspan="13" class="text-dark"><span>{{ __('Revenue :') }}</span></td>
                                     </tr>
+                                    @php
+                                    $totalIncome = 0;
+                                    $totalInvoices = 0;
+                                    $totalIncomeChart = 0;
+                                    @endphp
+
                                     @foreach ($incomeArr as $i => $income)
                                         <tr>
                                             <td>{{ $income['category'] }}</td>
                                             @foreach ($income['data'] as $j => $data)
                                                 <td>{{ \Auth::user()->priceFormat($data) }}</td>
+                                                @php
+                                                    $totalIncome = $totalIncome+$data;
+                                                @endphp
                                             @endforeach
+                                            <td><strong>{{ \Auth::user()->priceFormat($totalIncome) }}</strong></td>
                                         </tr>
                                     @endforeach
                                     <tr>
@@ -295,7 +306,11 @@
                                             <td>{{ $invoice['category'] }}</td>
                                             @foreach ($invoice['data'] as $j => $data)
                                                 <td>{{ \Auth::user()->priceFormat($data) }}</td>
+                                                @php
+                                                    $totalInvoices = $totalInvoices+$data;
+                                                @endphp
                                             @endforeach
+                                            <td><strong>{{ \Auth::user()->priceFormat($totalInvoices) }}</strong></td>
                                         </tr>
                                     @endforeach
                                     <tr>
@@ -310,8 +325,12 @@
                                         @foreach ($chartIncomeArr as $i => $income)
                                             @foreach ($income as $value)
                                                 <td>{{ \Auth::user()->priceFormat($value) }}</td>
+                                                @php
+                                                    $totalIncomeChart = $totalIncomeChart+$value;
+                                                @endphp
                                             @endforeach
                                         @endforeach
+                                        <td><strong>{{ \Auth::user()->priceFormat($totalIncomeChart) }}</strong></td>
                                     </tr>
                                 </tbody>
                             </table>

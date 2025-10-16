@@ -215,8 +215,7 @@
             <div class="col">
                 <input type="hidden" value="{{$filter['status'].' '.__('Invoice').' '.'Report of'.' '.$filter['startDateRange'].' to '.$filter['endDateRange'].' '.__('of').' '.$filter['customer']}}" id="filename">
                 <div class="card p-4 mb-4">
-                    <h7 class="report-text gray-text mb-0">{{__('Report')}} :</h7>
-                    <h6 class="report-text mb-0">{{__('Invoice Summary')}}</h6>
+                    <h7 class="report-text gray-text mb-0">{{__('Report')}} : <strong>{{__('Invoice Summary')}}</strong></h7>
                 </div>
             </div>
             @if($filter['customer']!= __('All'))
@@ -237,25 +236,30 @@
             @endif
             <div class="col">
                 <div class="card p-4 mb-4">
-                    <h7 class="report-text gray-text mb-0">{{__('Duration')}} :</h7>
-                    <h6 class="report-text mb-0">{{$filter['startDateRange'].' to '.$filter['endDateRange']}}</h6>
+                    <h7 class="report-text gray-text mb-0">{{__('Duration')}} : {{$filter['startDateRange'].' to '.$filter['endDateRange']}}</h7>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-xl-4 col-md-6 col-lg-4">
+            <div class="col-xl-3 col-md-6 col-lg-3">
                 <div class="card p-4 mb-4">
                     <h7 class="report-text gray-text mb-0">{{__('Total Invoice')}}</h7>
-                    <h6 class="report-text mb-0">{{Auth::user()->priceFormat($totalInvoice)}}</h6>
+                    <h6 class="report-text mb-0">{{Auth::user()->priceFormat($totalInvoice+$totalPlateformfees)}}</h6>
                 </div>
             </div>
-            <div class="col-xl-4 col-md-6 col-lg-4">
+            <div class="col-xl-3 col-md-6 col-lg-3">
                 <div class="card p-4 mb-4">
-                    <h7 class="report-text gray-text mb-0">{{__('Total Paid')}}</h7>
+                    <h7 class="report-text gray-text mb-0">{{__('Total Plateform Paid')}}</h7>
+                    <h6 class="report-text mb-0">{{Auth::user()->priceFormat($totalPlateformfees)}}</h6>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 col-lg-3">
+                <div class="card p-4 mb-4">
+                    <h7 class="report-text gray-text mb-0">{{__('Total Received')}}</h7>
                     <h6 class="report-text mb-0">{{Auth::user()->priceFormat($totalPaidInvoice)}}</h6>
                 </div>
             </div>
-            <div class="col-xl-4 col-md-6 col-lg-4">
+            <div class="col-xl-3 col-md-6 col-lg-3">
                 <div class="card p-4 mb-4">
                     <h7 class="report-text gray-text mb-0">{{__('Total Due')}}</h7>
                     <h6 class="report-text mb-0">{{Auth::user()->priceFormat($totalDueInvoice)}}</h6>
@@ -285,7 +289,7 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="tab-content" id="myTabContent2">
-                                    <div class="tab-pane fade fade" id="invoices" role="tabpanel" aria-labelledby="profile-tab3">
+                                    <div class="tab-pane fade fade table-responsive" id="invoices" role="tabpanel" aria-labelledby="profile-tab3">
                                         <table class="table table-flush" id="report-dataTable">
                                             <thead>
                                             <tr>
@@ -294,20 +298,19 @@
                                                 <th> {{__('Customer')}}</th>
                                                 <th> {{__('Category')}}</th>
                                                 <th> {{__('Status')}}</th>
-                                                <th> {{__('	Paid Amount')}}</th>
+                                                <th> {{__('Amount')}}</th>
+                                                <th> {{__('Plateform Fee')}}</th>
+                                                <th> {{__('Received Amount')}}</th>
                                                 <th> {{__('Amount Due')}}</th>
                                                 <th> {{__('Payment Date')}}</th>
-                                                <th> {{__('Amount')}}</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             @foreach ($invoices as $invoice)
                                                 <tr>
                                                     <td class="Id">
-                                               {{--     <a href="{{ route('invoice.show', \Crypt::encrypt($invoice->id)) }}">{{ Auth::user()->invoiceNumberFormat($invoice->invoice_id) }}</a>--}}
-                                                        <a href="{{ route('invoice.show',\Crypt::encrypt($invoice->id)) }}" class="btn btn-outline-primary">{{ Auth::user()->invoiceNumberFormat($invoice->id) }}</a>                                                    </td>
-
-
+                                                        <a href="{{ route('invoice.show',\Crypt::encrypt($invoice->id)) }}" class="badge bg-primary">{{ Auth::user()->invoiceNumberFormat($invoice->id) }}</a><br>
+                                                        <span class="badge bg-info">{{$invoice->ref_number}}</span>
                                                     </td>
                                                     <td>{{\Auth::user()->dateFormat($invoice->send_date)}}</td>
                                                     <td>{{!empty($invoice->customer)? $invoice->customer->name:'-' }} </td>
@@ -325,10 +328,11 @@
                                                             <span class="badge fix_badges bg-success p-2 px-3">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
                                                         @endif
                                                     </td>
+                                                    <td> {{\Auth::user()->priceFormat($invoice->getTotal()+$invoice->getTotalPlateformFee())}}</td>
+                                                    <td> {{\Auth::user()->priceFormat($invoice->getTotalPlateformFee())}}</td>
                                                     <td> {{\Auth::user()->priceFormat($invoice->getTotal()-$invoice->getDue())}}</td>
                                                     <td> {{\Auth::user()->priceFormat($invoice->getDue())}}</td>
-                                                    <td>{{!empty($invoice->lastPayments)?\Auth::user()->dateFormat($invoice->lastPayments->date):'-'}}</td>
-                                                    <td> {{\Auth::user()->priceFormat($invoice->getTotal())}}</td>
+                                                    <td>{{!empty($invoice->lastPayments)?\Auth::user()->dateFormat($invoice->lastPayments->date):'N/A'}}</td>
                                                 </tr>
                                             @endforeach
                                             </tbody>

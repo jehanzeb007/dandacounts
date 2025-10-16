@@ -136,7 +136,7 @@ class Invoice extends Model
 
     public function lastPayments()
     {
-        return $this->hasOne('App\Models\InvoicePayment', 'id', 'invoice_id');
+        return $this->hasOne('App\Models\InvoicePayment', 'invoice_id','id');
     }
 
     public function taxes()
